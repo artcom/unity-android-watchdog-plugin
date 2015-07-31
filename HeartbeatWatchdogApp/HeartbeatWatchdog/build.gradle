@@ -1,0 +1,22 @@
+apply plugin: 'java'
+
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
+jar {
+    dependsOn configurations.runtime
+    from {
+        (configurations.runtime - configurations.provided).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    } {
+        exclude 'com.google.android'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    provided 'com.google.android:android:4.1.1.4'
+}
