@@ -4,11 +4,11 @@ using System.Collections;
 namespace Artcom {
     public class UnityHeartbeat : MonoBehaviour {
 
-        private AndroidJavaObject toastExample = null;
+        private AndroidJavaObject watchdog = null;
         private AndroidJavaObject activityContext = null;
 
         void Start() {
-            if (toastExample == null) {
+            if (watchdog == null) {
                 using(AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer")) {
                     activityContext = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
                 }
@@ -16,10 +16,10 @@ namespace Artcom {
                 using(AndroidJavaClass pluginClass = new AndroidJavaClass("com.artcom.HeartbeatWatchdog")) {
                     Debug.Log(pluginClass);
                     if (pluginClass != null) {
-                        toastExample = pluginClass.CallStatic<AndroidJavaObject>("instance");
-                        toastExample.Call("setContext", activityContext);
+                        watchdog = pluginClass.CallStatic<AndroidJavaObject>("instance");
+                        watchdog.Call("setContext", activityContext);
                         activityContext.Call("runOnUiThread", new AndroidJavaRunnable(() => {
-                            toastExample.Call("startWatchdog");
+                            watchdog.Call("startWatchdog");
                         }));
                     }
                 }
@@ -27,7 +27,7 @@ namespace Artcom {
         }
 
         void Update() {
-            toastExample.Call("tic");
+            watchdog.Call("tic");
         }
 
         public void ForceHangNow() {
@@ -37,5 +37,4 @@ namespace Artcom {
             }
         }
     }
-
 }
